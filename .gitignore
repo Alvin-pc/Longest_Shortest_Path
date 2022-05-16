@@ -1,32 +1,107 @@
-# Prerequisites
-*.d
+#include <iostream>
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+using namespace std;
 
-# Precompiled Headers
-*.gch
-*.pch
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+int main()
+{
+    int n, s;
 
-# Fortran module files
-*.mod
-*.smod
+    cout << "Enter size of Adjacency Matrix: ";
+    cin >> n;
+    cout <<"Enter the source node 0 to "<< n-1<<": ";
+    cin >> s;
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+    //G[n][n] will store the values of the adjacency matrix
+    
+    int** G= new int*[n];
+    for(int i=0; i<=n; i++)
+    {
+        G[i]= new int[n];
+    }
 
-# Executables
-*.exe
-*.out
-*.app
+    //Adjacency Matrix only stores 0 and 1 as the path connecting every node is of 1 unit length.
+    
+    cout<<"Enter the Adjacency Matrix: ";
+    for(int i=0; i<n; i++)
+    {
+        for(int j=0; j<n; j++)
+        {
+            cin >> G[i][j];
+        }
+    }
+
+    /*path_s[n][n] is used to store number of paths available from source
+    node to the particular node(indicated by column index),
+    The row  index is indicative of the path length of concerned path*/
+
+    //path_s[2][7] is number of paths of length 3 from node 5 to node 7
+
+    int** path_s= new int*[n];
+    for(int i=0; i<=n; i++)
+    {
+        path_s[i]= new int[n];
+    }
+
+    for (int i=0; i<n; i++)
+    {
+        for (int j=0; j<n; j++)
+        {
+            path_s [i][j]= 0;
+        }
+
+    }
+
+    for (int i=0; i<n; i++)
+    {
+        path_s[0][i]= G[s][i];
+    }
+
+    /*Move through each column, and check for first occurence of atleast one path.
+    counter keeps track of the column(destination node)
+    chart [] keeps tag of the length of the shortest path(row+1)*/
+    
+    int counter;
+    int chart[n];
+    for (int i=0; i<n; i++)
+    {
+        chart[i] = 0;
+    }
+
+    for(int i=0; i<n; i++)    // i is the destination node
+    {   counter=0;
+        // The shortest path from source node to itself is zero.
+        if (i==s){
+            continue;
+                }
+        while(path_s[counter][i]==0)    //As long as path_s[counter][i]==0, no path exists between the concerned nodes.
+        {
+            counter++;
+            for(int j=0; j<n; j++)
+            {
+                path_s[counter][i]+= path_s[counter-1][j]*G[j][i];
+                
+                // computing number of paths of length (counter+1) from s to i
+                
+            }
+        }
+        chart[i] = counter+1;   //The first non-zero value encountered in the column is the shortest path fro s to i
+    }
+
+    cout << "The shortest paths from node "<< s<< " to respective nodes is: "
+    for (int i=0; i<n; i++)
+    {
+        cout << chart[i]<< " ";
+    }
+    cout << endl<< endl;
+
+    for(int i=0; i<n; i++)    //To delete the inner arrays
+    {
+        delete [] G[i];
+        delete [] path_s[i];
+        delete [] G;
+        delete [] path_s;
+    }
+
+    return 0;
+}
